@@ -59,4 +59,4 @@ target/
 
 
 # Folders
-test/train/
+test/MNIST_data/
