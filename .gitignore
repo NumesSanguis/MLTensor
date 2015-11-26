@@ -59,4 +59,10 @@ target/
 
 
 # Folders
-test/MNIST_data/
+tutorial/MNIST_data/
+tutorial/data/
+
+# Files
+tutorial/data-1999
+tutorial/data-999
+tutorial/checkpoint
