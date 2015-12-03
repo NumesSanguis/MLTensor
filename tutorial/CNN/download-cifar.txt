@@ -1,0 +1,8 @@
+Automatically:
+Run: python cifar10_train.py
+
+
+Manually:
+http://www.cs.toronto.edu/~kriz/cifar.html
+
+CIFAR-10 python version

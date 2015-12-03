@@ -61,6 +61,7 @@ target/
 # Folders
 tutorial/MNIST_data/
 tutorial/data/
+tutorial/CNN/cifar-10-batches-py/
 
 # Files
 tutorial/data-1999
