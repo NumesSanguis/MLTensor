@@ -68,6 +68,7 @@ tutorial/CNN/cifar-10-batches-py/
 tutorial/mnist_logs/
 
 # Files
+*.*~
 tutorial/data-1999
 tutorial/data-999
 tutorial/checkpoint
