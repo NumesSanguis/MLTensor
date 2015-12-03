@@ -28,7 +28,7 @@ flags.DEFINE_float('learning_rate', 0.01, 'Initial learning rate.')
 
 def main(_):
   # Import data
-  mnist = input_data.read_data_sets('/tmp/data/', one_hot=True,
+  mnist = input_data.read_data_sets('MNIST_data', one_hot=True,
                                     fake_data=FLAGS.fake_data)
 
   sess = tf.InteractiveSession()
@@ -64,7 +64,7 @@ def main(_):
 
   # Merge all the summaries and write them out to /tmp/mnist_logs
   merged = tf.merge_all_summaries()
-  writer = tf.train.SummaryWriter('mnist_logs', sess.graph_def)
+  writer = tf.train.SummaryWriter('/tmp/mnist_logs', sess.graph_def)
   tf.initialize_all_variables().run()
 
   # Train the model, and feed in test data and record summaries every 10 steps

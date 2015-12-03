@@ -1,0 +1,2 @@
+1st terminal: python mnist_with_summaries.py
+2nd terminal: tensorboard --logdir=/tmp/mnist_logs
