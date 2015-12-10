@@ -16,7 +16,8 @@ def read_from_txt():
                 else:
                     data[i].append([line[0], line[1], line[2], line[4]])
         data[i].pop(0) #remove empty cell from initializing
-    
+
+    return(data)
 
     #eventual path for an image data/aligned/USERNAME/landmark_aligned_face.FACEID.IMAGENAME
     #i = fold
