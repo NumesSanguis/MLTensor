@@ -167,7 +167,7 @@ def _generate_image_and_label_batch(image, label, min_queue_examples):
 
   return images, tf.reshape(label_batch, [FLAGS.batch_size])
 
-
+read_cifar10
 def distorted_inputs():
   """Construct distorted input for CIFAR training using the Reader ops.
 
