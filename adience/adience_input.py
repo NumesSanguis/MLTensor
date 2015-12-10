@@ -1,9 +1,7 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import tensorflow.python.platform
 import tensorflow as tf
+
+from os.path import join
 
 
 def read_adience(folder_queue):
@@ -17,6 +15,7 @@ def read_adience(folder_queue):
     test[4][0] = ['115321157@N03', '12111034286_4f5bfbacea_o.jpg', 'f']
     print(test)
 
+    # join('data', 'aligned', test[0][0][0], test[0][0][1])
     return test
 
 if __name__ == '__main__':
