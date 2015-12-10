@@ -1,4 +1,4 @@
-user_id	original_image	face_id	age	gender	x	y	dx	dy	tilt_ang	fiducial_yaw_angle	fiducial_score
+user_id		original_image		face_id	age	gender	x	y	dx	dy	tilt_ang	fiducial_yaw_angle	fiducial_score
 30601258@N03	10424815813_e94629b1ec_o.jpg	2	(25, 32)	m	301	105	640	641	0	0	94
 30601258@N03	10437979845_5985be4b26_o.jpg	3	(25, 32)	m	752	1255	484	485	180	0	47
 30601258@N03	11816644924_075c3d8d59_o.jpg	2	(25, 32)	m	175	80	769	768	-75	0	34
