@@ -22,20 +22,19 @@ def read_adience(folder_queue):
 
 
 def read_from_txt():
-    data = [[[]]]
+    data = [[[]] for x in range(5)]
     
     for i in range(5): #i = foldnumber
-        print(i)
-        j = 0; #j is image number in fold
+        header = True
         with open("data/fold_frontal_{}_data.txt".format(i)) as tsv:
             for line in csv.reader(tsv, dialect="excel-tab"): #You can also use delimiter="\t" rather than giving a dialect.
-                try:
+                if header == True:
+                    header = False
+                else:
                     data[i].append([line[0], line[1], line[4]])
-                except:
-                    data[i][j][0] = 1
-                    
-                j+=1
     print data[0][0]
+    print data[0][1]
+    print data[0][1]
     
 
 if __name__ == '__main__':
