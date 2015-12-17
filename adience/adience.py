@@ -1,19 +1,4 @@
-# Copyright 2015 Google Inc. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-"""Builds the CIFAR-10 network.
+"""Builds the Adience network.
 
 Summary of available functions:
 
@@ -46,26 +31,27 @@ from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
-from tensorflow.models.image.cifar10 import cifar10_input
+import adience_input
 from tensorflow.python.platform import gfile
+
+ad_input = adience_input.DataInput()
 
 FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
-tf.app.flags.DEFINE_integer('batch_size', 128,
+tf.app.flags.DEFINE_integer('batch_size', 32,
                             """Number of images to process in a batch.""")
-tf.app.flags.DEFINE_string('data_dir', '/tmp/cifar10_data',
-                           """Path to the CIFAR-10 data directory.""")
 
 # Process images of this size. Note that this differs from the original CIFAR
 # image size of 32 x 32. If one alters this number, then the entire model
 # architecture will change and any model would need to be retrained.
-IMAGE_SIZE = 24
+IMAGE_SIZE = 812
 
 # Global constants describing the CIFAR-10 data set.
-NUM_CLASSES = 10
-NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
-NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
+NUM_CLASSES = 2
+
+NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 0 #change it when reading input data (in distorded inputs)
+#NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
 
 # Constants describing the training process.
 MOVING_AVERAGE_DECAY = 0.9999     # The decay to use for the moving average.
@@ -77,9 +63,6 @@ INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
 # to differentiate the operations. Note that this prefix is removed from the
 # names of the summaries when visualizing a model.
 TOWER_NAME = 'tower'
-
-DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz'
-
 
 def _activation_summary(x):
   """Helper to create summaries for activations.
@@ -167,7 +150,7 @@ def _generate_image_and_label_batch(image, label, min_queue_examples):
 
   return images, tf.reshape(label_batch, [FLAGS.batch_size])
 
-#read_cifar10
+read_cifar10
 def distorted_inputs():
   """Construct distorted input for CIFAR training using the Reader ops.
 
@@ -185,11 +168,16 @@ def distorted_inputs():
     if not gfile.Exists(f):
       raise ValueError('Failed to find file: ' + f)
 
+  ad_input.read_from_text()
+  #change if you want to go to cross-fold
+  #
+  global.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = len(ad_input.train_data)
+
   # Create a queue that produces the filenames to read.
-  filename_queue = tf.train.string_input_producer(filenames)
+  #filename_queue = tf.train.string_input_producer(filenames)
 
   # Read examples from files in the filename queue.
-  read_input = cifar10_input.read_cifar10(filename_queue)
+  read_input = ad_input.read_adience()
   reshaped_image = tf.cast(read_input.uint8image, tf.float32)
 
   height = IMAGE_SIZE
@@ -239,14 +227,13 @@ def inputs(eval_data):
     images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
     labels: Labels. 1D tensor of [batch_size] size.
   """
-  if not FLAGS.data_dir:
-    raise ValueError('Please supply a data_dir')
 
+  #TODO:
   if not eval_data:
     filenames = [os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin',
                               'data_batch_%d.bin' % i)
                  for i in xrange(1, 5)]
-    num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
+    num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN 
   else:
     filenames = [os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin',
                               'test_batch.bin')]
@@ -479,24 +466,3 @@ def train(total_loss, global_step):
     train_op = tf.no_op(name='train')
 
   return train_op
-
-
-def maybe_download_and_extract():
-  """Download and extract the tarball from Alex's website."""
-  print("Maybe download")
-  dest_directory = FLAGS.data_dir
-  if not os.path.exists(dest_directory):
-    os.makedirs(dest_directory)
-  filename = DATA_URL.split('/')[-1]
-  filepath = os.path.join(dest_directory, filename)
-  if not os.path.exists(filepath):
-    def _progress(count, block_size, total_size):
-      sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename,
-          float(count * block_size) / float(total_size) * 100.0))
-      sys.stdout.flush()
-    filepath, _ = urllib.request.urlretrieve(DATA_URL, filepath,
-                                             reporthook=_progress)
-    print()
-    statinfo = os.stat(filepath)
-    print('Succesfully downloaded', filename, statinfo.st_size, 'bytes.')
-    tarfile.open(filepath, 'r:gz').extractall(dest_directory)
