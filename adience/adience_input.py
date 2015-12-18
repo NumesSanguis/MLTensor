@@ -1,8 +1,11 @@
 import tensorflow.python.platform
 import tensorflow as tf
-
+from PIL import Image
+import numpy as np
 from os.path import join
 import csv
+from scipy import misc
+import tensorflow as tf
 
 class DataInput():
     def __init__(self):
@@ -46,16 +49,55 @@ class DataInput():
         pass
 
     def read_adience(self):
-        self.filepath_queue = tf.train.string_input_producer(self.train_data)
 
-        reader = tf.FixedLengthRecordReader(record_bytes=60)
-        key, value = reader.read(self.filepath_queue)
-        print(key.get_shape().as_list())
-        print(value.get_shape().as_list())
+        img = misc.imread('/home/marcel/work2.jpg')
+        # print img.shape    # (32, 32, 3)
+        #
+        # img_tf = tf.Variable(img)
+        # print(img_tf)
+        # print img_tf.get_shape().as_list()  # [32, 32, 3]
 
-        #result.label = tf.cast(train_data[i?][3]), tf.int32)
-        #result = AdienceRecord()
-        #result.image = 
+        string = ['/home/marcel/work2.jpg']  # '/home/marcel/work1.jpg'
+        filepath_queue = tf.train.string_input_producer(string)
+
+        self.reader = tf.WholeFileReader()
+        key, value = self.reader.read(filepath_queue)
+
+        print(value)
+
+        # img = misc.imread(value)
+        # print img.shape    # (32, 32, 3)
+        # img_tf = tf.Variable(img)
+
+
+        my_img = tf.image.decode_jpeg(value, channels=3)
+        print(my_img)
+        #
+        # #float_img = tf.cast(img, tf.float32)
+        # # tf.image_summary('img', float_img)
+        # #
+        # # sess = tf.Session()
+        # # summary_op = tf.merge
+        #
+        #print(key)
+        # print(value)
+        # print(my_img.get_shape().as_list())
+
+        # init = tf.initialize_all_variables()
+        # sess = tf.Session()
+        # sess.run(init)
+        # im = sess.run(img_tf)
+        #
+        # import matplotlib.pyplot as plt
+        # fig = plt.figure()
+        # fig.add_subplot(1,2,1)
+        # plt.imshow(im)
+        # fig.add_subplot(1,2,2)
+        # plt.imshow(img)
+        # plt.show()
+
+
+
 
 if __name__ == '__main__':
     ad = DataInput()

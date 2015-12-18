@@ -150,7 +150,6 @@ def _generate_image_and_label_batch(image, label, min_queue_examples):
 
   return images, tf.reshape(label_batch, [FLAGS.batch_size])
 
-read_cifar10
 def distorted_inputs():
   """Construct distorted input for CIFAR training using the Reader ops.
 
@@ -171,7 +170,8 @@ def distorted_inputs():
   ad_input.read_from_text()
   #change if you want to go to cross-fold
   #
-  global.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = len(ad_input.train_data)
+  global NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
+  NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = len(ad_input.train_data)
 
   # Create a queue that produces the filenames to read.
   #filename_queue = tf.train.string_input_producer(filenames)
