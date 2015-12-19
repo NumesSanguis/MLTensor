@@ -5,7 +5,9 @@ import numpy as np
 from os.path import join
 import csv
 from scipy import misc
-import tensorflow as tf
+
+KNOWN_HEIGHT = 812
+KNOWN_WIDTH = 812
 
 class DataInput():
     def __init__(self):
@@ -50,14 +52,14 @@ class DataInput():
 
     def read_adience(self):
 
-        img = misc.imread('/home/marcel/work2.jpg')
+        # img = misc.imread('./test.jpg')
         # print img.shape    # (32, 32, 3)
         #
         # img_tf = tf.Variable(img)
         # print(img_tf)
         # print img_tf.get_shape().as_list()  # [32, 32, 3]
 
-        string = ['/home/marcel/work2.jpg']  # '/home/marcel/work1.jpg'
+        string = ['./test.jpg']  # '/home/marcel/work1.jpg'
         filepath_queue = tf.train.string_input_producer(string)
 
         self.reader = tf.WholeFileReader()
@@ -71,7 +73,28 @@ class DataInput():
 
 
         my_img = tf.image.decode_jpeg(value, channels=3)
+        my_img.set_shape([KNOWN_HEIGHT, KNOWN_WIDTH, 3])
         print(my_img)
+
+        init_op = tf.initialize_all_variables()
+        with tf.Session() as sess:
+            sess.run(init_op)
+
+            # Start populating the filename queue.
+
+            coord = tf.train.Coordinator()
+            threads = tf.train.start_queue_runners(coord=coord)
+
+            for i in range(1): #length of your filename list
+              image = my_img.eval() #here is your image Tensor :)
+
+            print(image.shape)
+            #Image.show(Image.fromarray(np.asarray(image)))
+
+            coord.request_stop()
+            coord.join(threads)
+
+
         #
         # #float_img = tf.cast(img, tf.float32)
         # # tf.image_summary('img', float_img)
