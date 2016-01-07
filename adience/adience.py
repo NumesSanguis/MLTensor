@@ -41,9 +41,9 @@ FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
 tf.app.flags.DEFINE_integer('batch_size', 32,
-                                                        """Number of images to process in a batch.""")
+                            """Number of images to process in a batch.""")
 tf.app.flags.DEFINE_string('data_dir', 'data/aligned',
-                                                     """Path to the CIFAR-10 data directory.""")
+                             """Path to the CIFAR-10 data directory.""")
 
 # Process images of this size. Note that this differs from the original CIFAR
 # image size of 32 x 32. If one alters this number, then the entire model
@@ -54,7 +54,7 @@ IMAGE_SIZE = 64
 NUM_CLASSES = 2
 
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 0 #change it when reading input data (in distorded inputs)
-#NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
+NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 0
 
 # Constants describing the training process.
 MOVING_AVERAGE_DECAY = 0.9999         # The decay to use for the moving average.
@@ -198,9 +198,9 @@ def distorted_inputs():
     # Because these operations are not commutative, consider randomizing
     # randomize the order their operation.
     distorted_image = tf.image.random_brightness(distorted_image,
-                                                                                             max_delta=63)
+                                                 max_delta=63)
     distorted_image = tf.image.random_contrast(distorted_image,
-                                                                                         lower=0.2, upper=1.8)
+                                                lower=0.2, upper=1.8)
 
     # Subtract off the mean and divide by the variance of the pixels.
     float_image = tf.image.per_image_whitening(distorted_image)
@@ -214,11 +214,11 @@ def distorted_inputs():
 
     # Generate a batch of images and labels by building up a queue of examples.
     return _generate_image_and_label_batch(float_image, read_input.label,
-                                                                                 min_queue_examples)
+                                            min_queue_examples)
 
 
 def inputs(eval_data):
-    """Construct input for CIFAR evaluation using the Reader ops.
+    """Construct input for Adience evaluation using the Reader ops.
 
     Args:
         eval_data: bool, indicating if one should use the train or eval data set.
@@ -231,27 +231,30 @@ def inputs(eval_data):
         labels: Labels. 1D tensor of [batch_size] size.
     """
 
-    #TODO:
-    if not eval_data:
-        filenames = [os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin',
-                                                            'data_batch_%d.bin' % i)
-                                 for i in xrange(1, 5)]
-        num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN 
-    else:
-        filenames = [os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin',
-                                                            'test_batch.bin')]
-        num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
+    global NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
+    NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = len(ad_input.eval_string_que)
 
-    for f in filenames:
-        if not gfile.Exists(f):
-            raise ValueError('Failed to find file: ' + f)
+    #TODO:
+    # if not eval_data:
+    #     filenames = [os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin',
+    #                                                         'data_batch_%d.bin' % i)
+    #                              for i in xrange(1, 5)]
+    #     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
+    # else:
+    #     filenames = [os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin',
+    #                                                         'test_batch.bin')]
+    #     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
+    #
+    # for f in filenames:
+    #     if not gfile.Exists(f):
+    #         raise ValueError('Failed to find file: ' + f)
 
     # Create a queue that produces the filenames to read.
-    filename_queue = tf.train.string_input_producer(filenames)
+    #filename_queue = tf.train.string_input_producer(filenames)
 
     # Read examples from files in the filename queue.
-    read_input = cifar10_input.read_cifar10(filename_queue)
-    reshaped_image = tf.cast(read_input.uint8image, tf.float32)
+    read_input = ad_input.read_adience_eval()
+    reshaped_image = tf.cast(read_input.dec_image, tf.float32)
 
     height = IMAGE_SIZE
     width = IMAGE_SIZE
@@ -266,12 +269,12 @@ def inputs(eval_data):
 
     # Ensure that the random shuffling has good mixing properties.
     min_fraction_of_examples_in_queue = 0.4
-    min_queue_examples = int(num_examples_per_epoch *
-                                                     min_fraction_of_examples_in_queue)
+    min_queue_examples = int(NUM_EXAMPLES_PER_EPOCH_FOR_EVAL *
+                             min_fraction_of_examples_in_queue)
 
     # Generate a batch of images and labels by building up a queue of examples.
     return _generate_image_and_label_batch(float_image, read_input.label,
-                                                                                 min_queue_examples)
+                                             min_queue_examples)
 
 
 def inference(images):
@@ -435,10 +438,10 @@ def train(total_loss, global_step):
 
     # Decay the learning rate exponentially based on the number of steps.
     lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE,
-                                                                    global_step,
-                                                                    decay_steps,
-                                                                    LEARNING_RATE_DECAY_FACTOR,
-                                                                    staircase=True)
+                                    global_step,
+                                    decay_steps,
+                                    LEARNING_RATE_DECAY_FACTOR,
+                                    staircase=True)
     tf.scalar_summary('learning_rate', lr)
 
     # Generate moving averages of all losses and associated summaries.
