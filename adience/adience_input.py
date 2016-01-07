@@ -25,9 +25,10 @@ class DataInput():
                     if header == True:
                         header = False
                     else:
-                        img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],line[4])))
-                        img_path[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{}'.format(line[2],line[1])))
-                        img_label[i].append(line[4])
+                        if line[4]: #needed to remove images without label
+                            img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],line[4])))
+                            img_path[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{}'.format(line[2],line[1])))
+                            img_label[i].append(line[4])
                         #self.data[i].append([line[0], line[1], line[2], line[4], join('data','aligned',line[0],'landmark_aligned_face.{}.{}.jpg'.format(line[2],line[1])) ])
             img_path[i].pop(0)
             img_label[i].pop(0)
@@ -38,12 +39,12 @@ class DataInput():
         self.train_label = img_label[0] + img_label[1] + img_label[2] + img_label[3]
         self.train_string_que = img_string_que[0] + img_string_que[1] + img_string_que[2] + img_string_que[3]
 
-        #print("len train data: {}".format(len(self.train_data)))
-        #print("len file que data: {}".format(len(self.train_string_que)))
-        #print self.train_string_que[0]
-        #print self.train_data[0]
-        #print self.train_label[0]
-
+        print("len train data: {}".format(len(self.train_data)))
+        print("len file que data: {}".format(len(self.train_string_que)))
+        print self.train_string_que[-1]
+        print self.train_data[-1]
+        print self.train_label[-1]
+        print 'done reading data from txt files'
 
         #eventual path for an image data/aligned/USERNAME/landmark_aligned_face.FACEID.IMAGENAME
         #i = fold
@@ -85,8 +86,9 @@ class DataInput():
         # img_tf = tf.Variable(img)
         # print(img_tf)
         # print img_tf.get_shape().as_list()  # [32, 32, 3]
-
-        string = ['test.jpg,m', 'test2.jpg,f']  # , 'test2.jpg' '/home/marcel/work1.jpg'
+        print 'start reading adience'
+        #string = ['test.jpg,m', 'test2.jpg,f']  # , 'test2.jpg' '/home/marcel/work1.jpg'
+        string = self.train_string_que  # , 'test2.jpg' '/home/marcel/work1.jpg'
         #labels = ['m', 'f']
         filepath_queue = tf.train.string_input_producer(string)
 
@@ -98,11 +100,12 @@ class DataInput():
         # Test show image
         images = []
         with tf.Session() as sess:
-
+            print 'Populating filequeue'
             # Start populating the filename queue.
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
+            print 'done populating filequeue'
             if len(string) > 0:
               for i in range(len(string)):
                 plaatje = result.image.eval()
@@ -228,4 +231,4 @@ class DataInput():
 if __name__ == '__main__':
     ad = DataInput()
     ad.read_from_txt()
-    #ad.read_adience()
+    ad.read_adience()
