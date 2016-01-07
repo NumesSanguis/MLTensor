@@ -25,9 +25,10 @@ class DataInput():
                     if header == True:
                         header = False
                     else:
-                        img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],line[4])))
-                        img_path[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{}'.format(line[2],line[1])))
-                        img_label[i].append(line[4])
+                        if line[4]: #needed to remove images without label
+                            img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],line[4])))
+                            img_path[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{}'.format(line[2],line[1])))
+                            img_label[i].append(line[4])
                         #self.data[i].append([line[0], line[1], line[2], line[4], join('data','aligned',line[0],'landmark_aligned_face.{}.{}.jpg'.format(line[2],line[1])) ])
             img_path[i].pop(0)
             img_label[i].pop(0)
@@ -38,12 +39,12 @@ class DataInput():
         self.train_label = img_label[0] + img_label[1] + img_label[2] + img_label[3]
         self.train_string_que = img_string_que[0] + img_string_que[1] + img_string_que[2] + img_string_que[3]
 
-        #print("len train data: {}".format(len(self.train_data)))
-        #print("len file que data: {}".format(len(self.train_string_que)))
-        #print self.train_string_que[0]
-        #print self.train_data[0]
-        #print self.train_label[0]
-
+        print("len train data: {}".format(len(self.train_data)))
+        print("len file que data: {}".format(len(self.train_string_que)))
+        print self.train_string_que[-1]
+        print self.train_data[-1]
+        print self.train_label[-1]
+        print 'done reading data from txt files'
 
         #eventual path for an image data/aligned/USERNAME/landmark_aligned_face.FACEID.IMAGENAME
         #i = fold
@@ -92,6 +93,9 @@ class DataInput():
         print(self.train_string_que[-1])
         #print(string)
 
+        print 'start reading adience'
+        #string = ['test.jpg,m', 'test2.jpg,f']  # , 'test2.jpg' '/home/marcel/work1.jpg'
+        string = self.train_string_que  # , 'test2.jpg' '/home/marcel/work1.jpg'
         #labels = ['m', 'f']
         filepath_queue = tf.train.string_input_producer(self.train_string_que)
 
@@ -100,10 +104,40 @@ class DataInput():
         print(result.image)
         print(result.label)
 
-        # # Test show image
-        # images = []
-        # with tf.Session() as sess:
+        # Test show image
+        images = []
+        with tf.Session() as sess:
+            print 'Populating filequeue'
+            # Start populating the filename queue.
+            coord = tf.train.Coordinator()
+            threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+
+            print 'done populating filequeue'
+            if len(string) > 0:
+              for i in range(len(string)):
+                plaatje = result.image.eval()
+                images.append(plaatje)
+
+            Image._showxv(Image.fromarray(np.asarray(plaatje)))
+
+            coord.request_stop()
+            coord.join(threads)
+            print("tf.session success")
+
+        return(result)
+
+
+        # self.reader = tf.WholeFileReader()
+        # result.key, value = self.reader.read(filepath_queue)
+        # print("going to slice")
+        # result.label = tf.slice(value, 0, 1)
+        # imgpath = 'bla'  # value[1:]
         #
+        #
+        # print("label: {}".format(result.label))
+        # print("imgpath: {}".format(imgpath))
+        # print("key: {}".format(result.key))
+
         #     # Start populating the filename queue.
         #     coord = tf.train.Coordinator()
         #     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
@@ -118,35 +152,6 @@ class DataInput():
         #     coord.request_stop()
         #     coord.join(threads)
         #     print("tf.session success")
-
-        return(result)
-
-
-
-        # filename_queue = tf.train.string_input_producer(['test.jpg']) #  list of files to read
-        #
-        # reader = tf.WholeFileReader()
-        # key, value = reader.read(filename_queue)
-        #
-        # my_img = tf.image.decode_jpg(value) # use png or jpg decoder based on your files.
-        #
-        # init_op = tf.initialize_all_variables()
-        # with tf.Session() as sess:
-        #   sess.run(init_op)
-        #
-        # # Start populating the filename queue.
-        #
-        # coord = tf.train.Coordinator()
-        # threads = tf.train.start_queue_runners(coord=coord)
-        #
-        # for i in range(1): #length of your filename list
-        #   image = my_img.eval() #here is your image Tensor :)
-        #
-        # print(image.shape)
-        # #Image.show(Image.fromarray(np.asarray(image)))
-        #
-        # coord.request_stop()
-        # coord.join(threads)
 
 
 if __name__ == '__main__':
