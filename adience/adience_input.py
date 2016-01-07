@@ -82,11 +82,31 @@ class DataInput():
         #labels = ['m', 'f']
         filepath_queue = tf.train.string_input_producer(string)
 
-        image, label = self.read_my_file_format(filepath_queue.dequeue())
+        result.image, result.label = self.read_my_file_format(filepath_queue.dequeue())
 
-        print(image)
-        print(label)
+        print(result.image)
+        print(result.label)
 
+        images = []
+
+        with tf.Session() as sess:
+
+            # Start populating the filename queue.
+            coord = tf.train.Coordinator()
+            threads = tf.train.start_queue_runners(coord=coord)
+
+            if len(string) > 0:
+              for i in range(len(string)):
+                plaatje = result.image.eval()
+                images.append(plaatje)
+
+            Image._showxv(Image.fromarray(np.asarray(plaatje)))
+
+            coord.request_stop()
+            coord.join(threads)
+            print("tf.session success")
+
+        return(result)
 
 
         # self.reader = tf.WholeFileReader()
