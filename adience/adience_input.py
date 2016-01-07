@@ -51,7 +51,7 @@ class DataInput():
 
 
         # Smaller train queue
-        self.train_string_que = self.train_string_que[:3]
+        self.train_string_que = self.train_string_que[:16]
 
         print("len train data: {}".format(len(self.train_data)))
         print("len file que data: {}".format(len(self.train_string_que)))
