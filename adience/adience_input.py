@@ -16,6 +16,7 @@ class DataInput():
         #self.data = [[[]] for x in range(5)]
         img_path = [[] for x in range(5)]
         img_label = [[] for x in range(5)]
+        img_string_que = [[] for x in range(5)]
         
         for i in range(5): #i = foldnumber
             header = True
@@ -24,17 +25,25 @@ class DataInput():
                     if header == True:
                         header = False
                     else:
-                        img_path[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{}.jpg'.format(line[2],line[1])))
+                        img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],line[4])))
+                        img_path[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{}'.format(line[2],line[1])))
                         img_label[i].append(line[4])
                         #self.data[i].append([line[0], line[1], line[2], line[4], join('data','aligned',line[0],'landmark_aligned_face.{}.{}.jpg'.format(line[2],line[1])) ])
             img_path[i].pop(0)
             img_label[i].pop(0)
+            img_string_que[i].pop(0)
             #self.data[i].pop(0) #remove empty cell from initializing
         #self.train_data = self.data[0] + self.data[1] + self.data[2] + self.data[3]
         self.train_data = img_path[0] + img_path[1] + img_path[2] + img_path[3]
         self.train_label = img_label[0] + img_label[1] + img_label[2] + img_label[3]
+        self.train_string_que = img_string_que[0] + img_string_que[1] + img_string_que[2] + img_string_que[3]
 
-        print("len train data: {}".format(len(self.train_data)))
+        #print("len train data: {}".format(len(self.train_data)))
+        #print("len file que data: {}".format(len(self.train_string_que)))
+        #print self.train_string_que[0]
+        #print self.train_data[0]
+        #print self.train_label[0]
+
 
         #eventual path for an image data/aligned/USERNAME/landmark_aligned_face.FACEID.IMAGENAME
         #i = fold
@@ -219,4 +228,4 @@ class DataInput():
 if __name__ == '__main__':
     ad = DataInput()
     ad.read_from_txt()
-    ad.read_adience()
+    #ad.read_adience()
