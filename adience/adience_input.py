@@ -86,13 +86,13 @@ class DataInput():
         print(result.image)
         print(result.label)
 
+        # Test show image
         images = []
-
         with tf.Session() as sess:
 
             # Start populating the filename queue.
             coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(coord=coord)
+            threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
             if len(string) > 0:
               for i in range(len(string)):
