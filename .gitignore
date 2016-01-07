@@ -68,6 +68,7 @@ tutorial/data/
 tutorial/CNN/cifar-10-batches-py/
 tutorial/mnist_logs/
 adience/data/aligned/
+adience/data/aligned_old/
 
 # Files
 *.*~
