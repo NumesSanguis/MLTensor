@@ -71,8 +71,10 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
         summary_op: Summary op.
     """
     with tf.Session() as sess:
+        print("Session started, get checkpoint")
         ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
+            print("Checkpoint found")
             # Restores from checkpoint
             saver.restore(sess, ckpt.model_checkpoint_path)
             # Assuming model_checkpoint_path looks something like:
@@ -87,6 +89,7 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
         coord = tf.train.Coordinator()
         try:
             threads = []
+            print("GraphKeys.QUEUE_RUNNERS")
             for qr in tf.get_collection(tf.GraphKeys.QUEUE_RUNNERS):
                 threads.extend(qr.create_threads(sess, coord=coord, daemon=True,  start=True))
 
@@ -108,6 +111,7 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
             summary.ParseFromString(sess.run(summary_op))
             summary.value.add(tag='Precision @ 1', simple_value=precision)
             summary_writer.add_summary(summary, global_step)
+            print("Summary writer done")
         except Exception as e:    # pylint: disable=broad-except
             coord.request_stop(e)
 

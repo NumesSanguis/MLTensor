@@ -145,6 +145,7 @@ class DataInput():
 
 
     def read_adience_eval(self):
+        print("Adience eval input")
 
         class AdienceRecord(object):
             pass
@@ -157,6 +158,7 @@ class DataInput():
 
         print(result.dec_image)
         print(result.label)
+        print("Adience eval input done")
 
         return(result)
 

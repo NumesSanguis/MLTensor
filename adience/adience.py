@@ -218,6 +218,7 @@ def distorted_inputs():
 
 
 def inputs(eval_data):
+    print("\neval inputs adience called")
     """Construct input for Adience evaluation using the Reader ops.
 
     Args:
@@ -255,14 +256,15 @@ def inputs(eval_data):
     # Read examples from files in the filename queue.
     read_input = ad_input.read_adience_eval()
     reshaped_image = tf.cast(read_input.dec_image, tf.float32)
+    print("reshaped image eval")
 
     height = IMAGE_SIZE
     width = IMAGE_SIZE
 
     # Image processing for evaluation.
     # Crop the central [height, width] of the image.
-    resized_image = tf.image.resize_image_with_crop_or_pad(reshaped_image,
-                                                                                                                 width, height)
+    resized_image = tf.image.resize_image_with_crop_or_pad(reshaped_image, width, height)
+    print("image resized")
 
     # Subtract off the mean and divide by the variance of the pixels.
     float_image = tf.image.per_image_whitening(resized_image)
@@ -271,6 +273,8 @@ def inputs(eval_data):
     min_fraction_of_examples_in_queue = 0.4
     min_queue_examples = int(NUM_EXAMPLES_PER_EPOCH_FOR_EVAL *
                              min_fraction_of_examples_in_queue)
+
+    print("eval inputs adience done")
 
     # Generate a batch of images and labels by building up a queue of examples.
     return _generate_image_and_label_batch(float_image, read_input.label,
