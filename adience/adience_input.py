@@ -87,8 +87,13 @@ class DataInput():
         # print img_tf.get_shape().as_list()  # [32, 32, 3]
 
         string = ['test.jpg,m', 'test2.jpg,f']  # , 'test2.jpg' '/home/marcel/work1.jpg'
+
+        print(self.train_string_que[0])
+        print(self.train_string_que[-1])
+        print(string)
+
         #labels = ['m', 'f']
-        filepath_queue = tf.train.string_input_producer(string)
+        filepath_queue = tf.train.string_input_producer(self.train_string_que)
 
         result.image, result.label = self.read_my_file_format(filepath_queue.dequeue())
 
@@ -228,4 +233,4 @@ class DataInput():
 if __name__ == '__main__':
     ad = DataInput()
     ad.read_from_txt()
-    #ad.read_adience()
+    ad.read_adience()

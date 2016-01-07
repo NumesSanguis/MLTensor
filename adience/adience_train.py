@@ -98,7 +98,7 @@ def train():
 
 
 def main(argv=None):  # pylint: disable=unused-argument
-  cifar10.maybe_download_and_extract()
+  #cifar10.maybe_download_and_extract()
   if gfile.Exists(FLAGS.train_dir):
     gfile.DeleteRecursively(FLAGS.train_dir)
   gfile.MakeDirs(FLAGS.train_dir)

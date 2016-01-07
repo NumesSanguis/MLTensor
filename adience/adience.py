@@ -178,7 +178,7 @@ def distorted_inputs():
 
   # Read examples from files in the filename queue.
   read_input = ad_input.read_adience()
-  reshaped_image = tf.cast(read_input.uint8image, tf.float32)
+  reshaped_image = tf.cast(read_input.image, tf.float32)
 
   height = IMAGE_SIZE
   width = IMAGE_SIZE
