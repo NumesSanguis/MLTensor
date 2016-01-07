@@ -39,6 +39,10 @@ class DataInput():
         self.train_label = img_label[0] + img_label[1] + img_label[2] + img_label[3]
         self.train_string_que = img_string_que[0] + img_string_que[1] + img_string_que[2] + img_string_que[3]
 
+
+        # Smaller train queue
+        self.train_string_que = self.train_string_que[:10]
+
         print("len train data: {}".format(len(self.train_data)))
         print("len file que data: {}".format(len(self.train_string_que)))
         print self.train_string_que[-1]
@@ -67,9 +71,13 @@ class DataInput():
           Two tensors: the decoded image, and the string label.
         """
         filename, label = tf.decode_csv(filename_and_label_tensor, [[""], [""]], ",")
+        # cast label to int32
+        label = tf.cast(label, tf.int32)
+        #print(label)
+
         file_contents = tf.read_file(filename)
         image = tf.image.decode_jpeg(file_contents)
-        #image.set_shape([KNOWN_HEIGHT, KNOWN_WIDTH, 3])
+        image.set_shape([KNOWN_HEIGHT, KNOWN_WIDTH, 3])
 
         return image, label
 
@@ -99,30 +107,30 @@ class DataInput():
         #labels = ['m', 'f']
         filepath_queue = tf.train.string_input_producer(self.train_string_que)
 
-        result.image, result.label = self.read_my_file_format(filepath_queue.dequeue())
+        result.dec_image, result.label = self.read_my_file_format(filepath_queue.dequeue())
 
-        print(result.image)
+        print(result.dec_image)
         print(result.label)
 
-        # Test show image
-        images = []
-        with tf.Session() as sess:
-            print 'Populating filequeue'
-            # Start populating the filename queue.
-            coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-
-            print 'done populating filequeue'
-            if len(string) > 0:
-              for i in range(len(string)):
-                plaatje = result.image.eval()
-                images.append(plaatje)
-
-            Image._showxv(Image.fromarray(np.asarray(plaatje)))
-
-            coord.request_stop()
-            coord.join(threads)
-            print("tf.session success")
+        # # Test show image
+        # images = []
+        # with tf.Session() as sess:
+        #     print 'Populating filequeue'
+        #     # Start populating the filename queue.
+        #     coord = tf.train.Coordinator()
+        #     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+        #
+        #     print 'done populating filequeue'
+        #     if len(string) > 0:
+        #       for i in range(len(string)):
+        #         plaatje = result.image.eval()
+        #         images.append(plaatje)
+        #
+        #     Image._showxv(Image.fromarray(np.asarray(plaatje)))
+        #
+        #     coord.request_stop()
+        #     coord.join(threads)
+        #     print("tf.session success")
 
         return(result)
 
