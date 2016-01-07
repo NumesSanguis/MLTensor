@@ -4,6 +4,12 @@ import tensorflow as tf
 from os.path import join
 import csv
 
+import os
+import glob
+import tensorflow as tf
+#from PIL import Image
+import numpy as np
+
 class DataInput():
     def __init__(self):
         pass
@@ -46,18 +52,32 @@ class DataInput():
         pass
 
     def read_adience(self):
-        self.filepath_queue = tf.train.string_input_producer(self.train_data)
+        filename_queue = tf.train.string_input_producer(['test.jpg']) #  list of files to read
 
-        reader = tf.FixedLengthRecordReader(record_bytes=60)
-        key, value = reader.read(self.filepath_queue)
-        print(key.get_shape().as_list())
-        print(value.get_shape().as_list())
+        reader = tf.WholeFileReader()
+        key, value = reader.read(filename_queue)
 
-        #result.label = tf.cast(train_data[i?][3]), tf.int32)
-        #result = AdienceRecord()
-        #result.image = 
+        my_img = tf.image.decode_jpg(value) # use png or jpg decoder based on your files.
+
+        init_op = tf.initialize_all_variables()
+        with tf.Session() as sess:
+          sess.run(init_op)
+
+        # Start populating the filename queue.
+
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(coord=coord)
+
+        for i in range(1): #length of your filename list
+          image = my_img.eval() #here is your image Tensor :) 
+
+        print(image.shape)
+        #Image.show(Image.fromarray(np.asarray(image)))
+
+        coord.request_stop()
+        coord.join(threads)
 
 if __name__ == '__main__':
     ad = DataInput()
-    ad.read_from_txt()
+    #ad.read_from_txt()
     ad.read_adience()
