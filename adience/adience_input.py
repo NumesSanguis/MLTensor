@@ -48,6 +48,22 @@ class DataInput():
         #eventual path for an image data/aligned/data[i][j][0]/landmark_aligned_face.data[i][j][2].data[i][j][1]
 
 
+    def read_my_file_format(self, filename_and_label_tensor):
+        """Consumes a single filename and label as a ' '-delimited string.
+
+        Args:
+          filename_and_label_tensor: A scalar string tensor.
+
+        Returns:
+          Two tensors: the decoded image, and the string label.
+        """
+        filename, label = tf.decode_csv(filename_and_label_tensor, [[""], [""]], ",")
+        file_contents = tf.read_file(filename)
+        image = tf.image.decode_jpeg(file_contents)
+        #image.set_shape([KNOWN_HEIGHT, KNOWN_WIDTH, 3])
+
+        return image, label
+
 
     def read_adience(self):
 
@@ -62,33 +78,40 @@ class DataInput():
         # print(img_tf)
         # print img_tf.get_shape().as_list()  # [32, 32, 3]
 
-        string = ['mtest.jpg', 'ftest2.jpg']  # , 'test2.jpg' '/home/marcel/work1.jpg'
-        labels = ['m', 'f']
+        string = ['test.jpg,m', 'test2.jpg,f']  # , 'test2.jpg' '/home/marcel/work1.jpg'
+        #labels = ['m', 'f']
         filepath_queue = tf.train.string_input_producer(string)
 
-        self.reader = tf.WholeFileReader()
-        result.key, value = self.reader.read(filepath_queue)
-        print("going to slice")
-        result.label = tf.slice(value, 0, 1)
-        imgpath = 'bla'  # value[1:]
+        image, label = self.read_my_file_format(filepath_queue.dequeue())
+
+        print(image)
+        print(label)
 
 
-        print("label: {}".format(result.label))
-        print("imgpath: {}".format(imgpath))
-        print("key: {}".format(result.key))
 
-        # img = misc.imread(value)
-        # print img.shape    # (32, 32, 3)
-        # img_tf = tf.Variable(img)
+        # self.reader = tf.WholeFileReader()
+        # result.key, value = self.reader.read(filepath_queue)
+        # print("going to slice")
+        # result.label = tf.slice(value, 0, 1)
+        # imgpath = 'bla'  # value[1:]
+        #
+        #
+        # print("label: {}".format(result.label))
+        # print("imgpath: {}".format(imgpath))
+        # print("key: {}".format(result.key))
+        #
+        # # img = misc.imread(value)
+        # # print img.shape    # (32, 32, 3)
+        # # img_tf = tf.Variable(img)
+        #
+        #
+        # my_img = tf.image.decode_jpeg(imgpath, channels=3)
+        # my_img.set_shape([KNOWN_HEIGHT, KNOWN_WIDTH, 3])
+        # print(my_img)
+        #
+        # result.image = my_img
 
-
-        my_img = tf.image.decode_jpeg(imgpath, channels=3)
-        my_img.set_shape([KNOWN_HEIGHT, KNOWN_WIDTH, 3])
-        print(my_img)
-
-        result.image = my_img
-
-        return(result)
+        #return(result)
 
         # sess = tf.Session()
         # plaatje = Image.open(sess.run(value))
