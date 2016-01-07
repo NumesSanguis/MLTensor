@@ -6,8 +6,8 @@ from os.path import join
 import csv
 import sys
 
-KNOWN_HEIGHT = 812
-KNOWN_WIDTH = 812
+KNOWN_HEIGHT = 64
+KNOWN_WIDTH = 64
 
 class DataInput():
     def __init__(self):
@@ -123,28 +123,28 @@ class DataInput():
         print(result.label)
 
         # Test show image
-        images = []
-        with tf.Session() as sess:
+        # images = []
+        # with tf.Session() as sess:
 
-            #print(result.label.eval())
+        #     #print(result.label.eval())
 
-            print('Populating filequeue')
-            # Start populating the filename queue.
+        #     print('Populating filequeue')
+        #     # Start populating the filename queue.
 
-            coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+        #     coord = tf.train.Coordinator()
+        #     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-            print('done populating filequeue')
-            if len(string) > 0:
-              for i in range(len(string)):
-                plaatje = result.dec_image.eval()
-                images.append(plaatje)
+        #     print('done populating filequeue')
+        #     if len(string) > 0:
+        #       for i in range(len(string)):
+        #         plaatje = result.dec_image.eval()
+        #         images.append(plaatje)
 
-            Image._showxv(Image.fromarray(np.asarray(plaatje)))
+        #     Image._showxv(Image.fromarray(np.asarray(plaatje)))
 
-            coord.request_stop()
-            coord.join(threads)
-            print("tf.session success")
+        #     coord.request_stop()
+        #     coord.join(threads)
+        #     print("tf.session success")
 
         return(result)
 
