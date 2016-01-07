@@ -49,16 +49,22 @@ class DataInput():
         self.train_label = img_label[0] + img_label[1] + img_label[2] + img_label[3]
         self.train_string_que = img_string_que[0] + img_string_que[1] + img_string_que[2] + img_string_que[3]
 
+        # Test data
+        self.eval_data = img_path[4]
+        self.eval_label = img_label[4]
+        self.eval_string_que = img_string_que[4]
+
 
         # Smaller train queue
+
         #self.train_string_que = self.train_string_que[:10]
 
         print("len train data: {}".format(len(self.train_data)))
         print("len file que data: {}".format(len(self.train_string_que)))
-        print self.train_string_que[-1]
-        print self.train_data[-1]
-        print self.train_label[-1]
-        print 'done reading data from txt files'
+        print(self.train_string_que[-1])
+        print(self.train_data[-1])
+        print(self.train_label[-1])
+        print('done reading data from txt files')
 
         #eventual path for an image data/aligned/USERNAME/landmark_aligned_face.FACEID.IMAGENAME
         #i = fold
@@ -98,50 +104,39 @@ class DataInput():
             pass
         result = AdienceRecord()
 
-        # img = misc.imread('./test.jpg')
-        # print img.shape    # (32, 32, 3)
-        #
-        # img_tf = tf.Variable(img)
-        # print(img_tf)
-        # print img_tf.get_shape().as_list()  # [32, 32, 3]
-
-        #string = ['test.jpg,m', 'test2.jpg,f']  # , 'test2.jpg' '/home/marcel/work1.jpg'
-
         print(self.train_string_que[0])
         print(self.train_string_que[-1])
         #print(string)
 
-        print 'start reading adience'
+        print('start reading adience')
         #string = ['test.jpg,m', 'test2.jpg,f']  # , 'test2.jpg' '/home/marcel/work1.jpg'
-        string = self.train_string_que  # , 'test2.jpg' '/home/marcel/work1.jpg'
-        #labels = ['m', 'f']
-        filepath_queue = tf.train.string_input_producer(self.train_string_que)
 
+        filepath_queue = tf.train.string_input_producer(self.train_string_que)
         result.dec_image, result.label = self.read_my_file_format(filepath_queue.dequeue())
 
         print(result.dec_image)
         print(result.label)
 
-        # Test show image
+        # # Test show image
         # images = []
         # with tf.Session() as sess:
-
+        #
         #     #print(result.label.eval())
-
+        #
         #     print('Populating filequeue')
         #     # Start populating the filename queue.
-
+        #
         #     coord = tf.train.Coordinator()
         #     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-
+        #
         #     print('done populating filequeue')
         #     if len(string) > 0:
         #       for i in range(len(string)):
         #         plaatje = result.dec_image.eval()
         #         images.append(plaatje)
-
+        #
         #     Image._showxv(Image.fromarray(np.asarray(plaatje)))
-
+        #
         #     coord.request_stop()
         #     coord.join(threads)
         #     print("tf.session success")
@@ -149,31 +144,23 @@ class DataInput():
         return(result)
 
 
-        # self.reader = tf.WholeFileReader()
-        # result.key, value = self.reader.read(filepath_queue)
-        # print("going to slice")
-        # result.label = tf.slice(value, 0, 1)
-        # imgpath = 'bla'  # value[1:]
-        #
-        #
-        # print("label: {}".format(result.label))
-        # print("imgpath: {}".format(imgpath))
-        # print("key: {}".format(result.key))
+    def read_adience_eval(self):
+        print("Adience eval input")
 
-        #     # Start populating the filename queue.
-        #     coord = tf.train.Coordinator()
-        #     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-        #
-        #     if len(string) > 0:
-        #       for i in range(len(string)):
-        #         plaatje = result.image.eval()
-        #         images.append(plaatje)
-        #
-        #     Image._showxv(Image.fromarray(np.asarray(plaatje)))
-        #
-        #     coord.request_stop()
-        #     coord.join(threads)
-        #     print("tf.session success")
+        class AdienceRecord(object):
+            pass
+        result = AdienceRecord()
+
+        print('start reading adience')
+        filepath_queue = tf.train.string_input_producer(self.eval_string_que)
+
+        result.dec_image, result.label = self.read_my_file_format(filepath_queue.dequeue())
+
+        print(result.dec_image)
+        print(result.label)
+        print("Adience eval input done")
+
+        return(result)
 
 
 if __name__ == '__main__':
