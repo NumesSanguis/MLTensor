@@ -21,7 +21,7 @@ import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
-from tensorflow.models.image.cifar10 import cifar10
+from tensorflow.models.image.cifar10 import cifar10m
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -46,7 +46,7 @@ def train():
     # Calculate loss.
     loss = cifar10.loss(logits, labels)
 
-    # Build a Graph that trains the model with one batch of examples and
+    # Build a Grahalloph that trains the model with one batch of examples and
     # updates the model parameters.
     train_op = cifar10.train(loss, global_step)
 

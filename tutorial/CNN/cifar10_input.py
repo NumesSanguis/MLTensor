@@ -74,6 +74,7 @@ def read_cifar10(filename_queue):
   result.label = tf.cast(
       tf.slice(record_bytes, [0], [label_bytes]), tf.int32)
 
+
   # The remaining bytes after the label represent the image, which we reshape
   # from [depth * height * width] to [depth, height, width].
   depth_major = tf.reshape(tf.slice(record_bytes, [label_bytes], [image_bytes]),

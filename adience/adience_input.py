@@ -35,7 +35,7 @@ class DataInput():
         self.train_data = img_path[0] + img_path[1] + img_path[2] + img_path[3]
         self.train_label = img_label[0] + img_label[1] + img_label[2] + img_label[3]
 
-        print(len(self.train_data))
+        print("len train data: {}".format(len(self.train_data)))
 
         #eventual path for an image data/aligned/USERNAME/landmark_aligned_face.FACEID.IMAGENAME
         #i = fold
@@ -47,10 +47,13 @@ class DataInput():
         #data[i][j][4] =PATH
         #eventual path for an image data/aligned/data[i][j][0]/landmark_aligned_face.data[i][j][2].data[i][j][1]
 
-    class AdienceRecord(object):
-        pass
+
 
     def read_adience(self):
+
+        class AdienceRecord(object):
+            pass
+        result = AdienceRecord()
 
         # img = misc.imread('./test.jpg')
         # print img.shape    # (32, 32, 3)
@@ -59,40 +62,89 @@ class DataInput():
         # print(img_tf)
         # print img_tf.get_shape().as_list()  # [32, 32, 3]
 
-        string = ['./test.jpg']  # '/home/marcel/work1.jpg'
+        string = ['mtest.jpg', 'ftest2.jpg']  # , 'test2.jpg' '/home/marcel/work1.jpg'
+        labels = ['m', 'f']
         filepath_queue = tf.train.string_input_producer(string)
 
         self.reader = tf.WholeFileReader()
-        key, value = self.reader.read(filepath_queue)
+        result.key, value = self.reader.read(filepath_queue)
+        print("going to slice")
+        result.label = tf.slice(value, 0, 1)
+        imgpath = 'bla'  # value[1:]
 
-        print(value)
+
+        print("label: {}".format(result.label))
+        print("imgpath: {}".format(imgpath))
+        print("key: {}".format(result.key))
 
         # img = misc.imread(value)
         # print img.shape    # (32, 32, 3)
         # img_tf = tf.Variable(img)
 
 
-        my_img = tf.image.decode_jpeg(value, channels=3)
+        my_img = tf.image.decode_jpeg(imgpath, channels=3)
         my_img.set_shape([KNOWN_HEIGHT, KNOWN_WIDTH, 3])
         print(my_img)
 
-        init_op = tf.initialize_all_variables()
-        with tf.Session() as sess:
-            sess.run(init_op)
+        result.image = my_img
 
-            # Start populating the filename queue.
+        return(result)
 
-            coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(coord=coord)
+        # sess = tf.Session()
+        # plaatje = Image.open(sess.run(value))
+        # plaatje.show()
 
-            for i in range(1): #length of your filename list
-              image = my_img.eval() #here is your image Tensor :)
+        # sess = tf.Session()
+        # c = tf.constant(5.0)
+        # print(sess.run(c))
+        #print(sess.run(value))
 
-            print(image.shape)
-            #Image.show(Image.fromarray(np.asarray(image)))
+        # init = tf.initialize_all_variables()
+        # with tf.Session() as sess:
+        #     sess.run(init)
+        #     v = sess.run(value)
+        #     print(v)
 
-            coord.request_stop()
-            coord.join(threads)
+
+        # my_img_enc = tf.image.encode_jpeg(my_img)
+        # print(my_img_enc)
+        #my_img_enc.show()
+
+
+        # init_op = tf.initialize_all_variables()
+        # with tf.Session() as sess:
+        #     sess.run(init_op)
+        #
+        #     # Start populating the filename queue.
+        #
+        #     coord = tf.train.Coordinator()
+        #     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+        #
+        #     try:
+        #         # while not coord.should_stop():
+        #         image = my_img.eval()
+        #         print(image.shape)
+        #             #Image.show(Image.fromarray(np.asarray(image)))
+        #
+        #     except(tf.errors.OutOfRangeError):
+        #         print('Done training -- epoch limit reached')
+        #
+        #     finally:
+        #         # When done, ask the threads to stop.
+        #         coord.request_stop()
+        #
+        #     # for i in range(1): #length of your filename list
+        #     #   image = my_img.eval() #here is your image Tensor :)
+        #     #
+        #     # print(image.shape)
+        #     #Image.show(Image.fromarray(np.asarray(image)))
+        #
+        #     # Wait for threads to finish.
+        #     coord.join(threads)
+        #     sess.close()
+
+            # coord.request_stop()
+            # coord.join(threads)
 
 
         #
