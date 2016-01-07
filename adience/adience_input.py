@@ -6,8 +6,8 @@ from os.path import join
 import csv
 import sys
 
-KNOWN_HEIGHT = 812
-KNOWN_WIDTH = 812
+KNOWN_HEIGHT = 64
+KNOWN_WIDTH = 64
 
 class DataInput():
     def __init__(self):
@@ -51,7 +51,8 @@ class DataInput():
 
 
         # Smaller train queue
-        self.train_string_que = self.train_string_que[:16]
+
+        #self.train_string_que = self.train_string_que[:10]
 
         print("len train data: {}".format(len(self.train_data)))
         print("len file que data: {}".format(len(self.train_string_que)))

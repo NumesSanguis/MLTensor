@@ -26,7 +26,7 @@ import adience
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('train_dir', 'train',
+tf.app.flags.DEFINE_string('train_dir', '~/MLtrained',
                          """Directory where to write event logs """
                          """and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 1000000,
@@ -47,13 +47,16 @@ def train():
 
         # Build a Graph that computes the logits predictions from the
         # inference model.
+        print('call inference')
         logits = adience.inference(images)
 
         # Calculate loss.
+        print('call loss')
         loss = adience.loss(logits, labels)
 
         # Build a Grahalloph that trains the model with one batch of examples and
         # updates the model parameters.
+        print('train_op')
         train_op = adience.train(loss, global_step)
 
         # Create a saver.
