@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 from os.path import join
 import csv
+import sys
 
 KNOWN_HEIGHT = 812
 KNOWN_WIDTH = 812
@@ -25,10 +26,19 @@ class DataInput():
                     if header == True:
                         header = False
                     else:
-                        if line[4]: #needed to remove images without label
-                            img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],line[4])))
+                        if line[4] and line[4] != 'u': #needed to remove images without label
+                            if line[4] == 'm': # 0 men
+                                img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],0)))
+                                img_label[i].append(0)
+                            elif line[4] == 'f':  # 1 women
+                                img_string_que[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{},{}'.format(line[2],line[1],1)))
+                                img_label[i].append(1)
+                            else:
+                                print("abort")
+                                print(line[4])
+                                sys.exit()
+
                             img_path[i].append(join('data','aligned',line[0],'landmark_aligned_face.{}.{}'.format(line[2],line[1])))
-                            img_label[i].append(line[4])
                         #self.data[i].append([line[0], line[1], line[2], line[4], join('data','aligned',line[0],'landmark_aligned_face.{}.{}.jpg'.format(line[2],line[1])) ])
             img_path[i].pop(0)
             img_label[i].pop(0)
@@ -70,7 +80,7 @@ class DataInput():
         Returns:
           Two tensors: the decoded image, and the string label.
         """
-        filename, label = tf.decode_csv(filename_and_label_tensor, [[""], [""]], ",")
+        filename, label = tf.decode_csv(filename_and_label_tensor, [[""], []], ",")
         # cast label to int32
         label = tf.cast(label, tf.int32)
         #print(label)
@@ -112,25 +122,29 @@ class DataInput():
         print(result.dec_image)
         print(result.label)
 
-        # # Test show image
-        # images = []
-        # with tf.Session() as sess:
-        #     print 'Populating filequeue'
-        #     # Start populating the filename queue.
-        #     coord = tf.train.Coordinator()
-        #     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-        #
-        #     print 'done populating filequeue'
-        #     if len(string) > 0:
-        #       for i in range(len(string)):
-        #         plaatje = result.image.eval()
-        #         images.append(plaatje)
-        #
-        #     Image._showxv(Image.fromarray(np.asarray(plaatje)))
-        #
-        #     coord.request_stop()
-        #     coord.join(threads)
-        #     print("tf.session success")
+        # Test show image
+        images = []
+        with tf.Session() as sess:
+
+            #print(result.label.eval())
+
+            print('Populating filequeue')
+            # Start populating the filename queue.
+
+            coord = tf.train.Coordinator()
+            threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+
+            print('done populating filequeue')
+            if len(string) > 0:
+              for i in range(len(string)):
+                plaatje = result.dec_image.eval()
+                images.append(plaatje)
+
+            Image._showxv(Image.fromarray(np.asarray(plaatje)))
+
+            coord.request_stop()
+            coord.join(threads)
+            print("tf.session success")
 
         return(result)
 
