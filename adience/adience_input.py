@@ -4,7 +4,6 @@ from PIL import Image
 import numpy as np
 from os.path import join
 import csv
-from scipy import misc
 
 KNOWN_HEIGHT = 812
 KNOWN_WIDTH = 812
