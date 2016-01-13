@@ -379,7 +379,7 @@ def loss(logits, labels):
     # shape [batch_size, NUM_CLASSES].
     sparse_labels = tf.reshape(labels, [FLAGS.batch_size, 1])
     #(FLAGS.batch_size, 1) if old tensorflow
-    indices = tf.reshape(tf.range(FLAGS.batch_size), [FLAGS.batch_size, 1])
+    indices = tf.reshape(tf.range(0,FLAGS.batch_size,1), [FLAGS.batch_size, 1])
     concated = tf.concat(1, [indices, sparse_labels])
     dense_labels = tf.sparse_to_dense(concated,
                                         [FLAGS.batch_size, NUM_CLASSES],
