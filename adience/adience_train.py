@@ -143,27 +143,37 @@ def train(train_continue):
 def main(argv=None):    # pylint: disable=unused-argument
     #cifar10.maybe_download_and_extract()
 
-    # Continue training or remove current training data
-    train_continue = None
-    while train_continue == None:
-        input_continue = raw_input("Continue training? (y/n): ")
-        input_continue.lower()
+    # Continue training or remove current training data if existing data
+    if gfile.Exists(FLAGS.train_dir):
+        print("Train data found")
+        train_continue = None
 
-        if input_continue == 'y' or input_continue == 'yes':
-            train_continue = True
-        if input_continue == 'n' or input_continue == 'no':
-            train_continue = False
+        while train_continue == None:
+            input_continue = raw_input("Continue training? (y/n): ")
+            input_continue.lower()
+
+            if input_continue == 'y' or input_continue == 'yes':
+                train_continue = True
+            elif input_continue == 'n' or input_continue == 'no':
+                train_continue = False
+            else:
+                print("Wrong input, please type y or n.")
+
+        # Continue True
+        if train_continue:
+            print("Continue True\n")
+            train(True)
+
+        # Continue False
         else:
-            print("Wrong input, please type y or n.")
-
-    # Continue True
-    if train_continue:
-        train(True)
-
-    # Continue False
-    else:
-        if gfile.Exists(FLAGS.train_dir):
+            print("Continue False, delete data\n")
             gfile.DeleteRecursively(FLAGS.train_dir)
+            gfile.MakeDirs(FLAGS.train_dir)
+            train(False)
+
+    # No previous train data
+    else:
+        print("No trainings data found\n")
         gfile.MakeDirs(FLAGS.train_dir)
         train(False)
 
