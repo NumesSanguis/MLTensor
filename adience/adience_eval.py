@@ -53,7 +53,7 @@ tf.app.flags.DEFINE_string('eval_data', 'test',
                            """Either 'test' or 'train_eval'.""")
 tf.app.flags.DEFINE_string('checkpoint_dir', '../../MLtrained',
                            """Directory where to read model checkpoints.""")
-tf.app.flags.DEFINE_integer('eval_interval_secs', 60 * 1,  # *5
+tf.app.flags.DEFINE_integer('eval_interval_secs', 20 * 1,  # *5
                             """How often to run the eval.""")
 tf.app.flags.DEFINE_integer('num_examples', 0,
                             """Number of examples to run.""")
@@ -113,10 +113,15 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
             summary_writer.add_summary(summary, global_step)
             print("Summary writer done")
         except Exception as e:    # pylint: disable=broad-except
+            print("exception called")
             coord.request_stop(e)
+            print("exception done")
 
+        print("request stop")
         coord.request_stop()
-        coord.join(threads, stop_grace_period_secs=10)
+        print("request stopped, grace shit")
+        coord.join(threads, stop_grace_period_secs=10)  # TODO fout
+        print("eval_once done")
 
 
 def evaluate():

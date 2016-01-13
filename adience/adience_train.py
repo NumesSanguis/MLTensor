@@ -29,13 +29,13 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('train_dir', '../../MLtrained',
                          """Directory where to write event logs """
                          """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 10000,
+tf.app.flags.DEFINE_integer('max_steps', 11000,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
 
 
-def train():
+def train(train_continue):
     """Train Adience for a number of steps."""
     with tf.Graph().as_default():
         global_step = tf.Variable(0, trainable=False)
@@ -59,9 +59,6 @@ def train():
         print('train_op')
         train_op = adience.train(loss, global_step)
 
-        # Create a saver.
-        saver = tf.train.Saver(tf.all_variables())
-
         # Build the summary operation based on the TF collection of Summaries.
         summary_op = tf.merge_all_summaries()
 
@@ -73,12 +70,49 @@ def train():
                 log_device_placement=FLAGS.log_device_placement))
         sess.run(init)
 
+        # Create a saver.
+        if not train_continue:
+            saver = tf.train.Saver(tf.all_variables())
+            load_step = 0
+
+        else:
+            # Restore the moving average version of the learned variables for eval.
+            variable_averages = tf.train.ExponentialMovingAverage(
+                    adience.MOVING_AVERAGE_DECAY)
+            variables_to_restore = {}
+            for v in tf.all_variables():
+                if v in tf.trainable_variables():
+                    restore_name = variable_averages.average_name(v)
+                else:
+                    restore_name = v.op.name
+                variables_to_restore[restore_name] = v
+            saver = tf.train.Saver(variables_to_restore)
+
+            ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
+            if ckpt and ckpt.model_checkpoint_path:
+                print("Checkpoint found")
+                # Restores from checkpoint
+                saver.restore(sess, ckpt.model_checkpoint_path)
+                # Assuming model_checkpoint_path looks something like:
+                #     /my-favorite-path/cifar10_train/model.ckpt-0,
+                # extract global_step from it.
+                load_step = int(ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1])
+                print("Start from step: {}".format(load_step))
+
+            else:
+                print('No checkpoint file found')
+
         # Start the queue runners.
         tf.train.start_queue_runners(sess=sess)
 
         summary_writer = tf.train.SummaryWriter(FLAGS.train_dir, graph_def=sess.graph_def)
 
-        for step in xrange(FLAGS.max_steps):
+        for step in xrange(FLAGS.max_steps - load_step):
+            if load_step != 0:
+                step += load_step
+                #load_step = 0
+            #print("step: {}".format(step))
+
             start_time = time.time()
             _, loss_value = sess.run([train_op, loss])
             duration = time.time() - start_time
@@ -107,10 +141,30 @@ def train():
 
 def main(argv=None):    # pylint: disable=unused-argument
     #cifar10.maybe_download_and_extract()
-    if gfile.Exists(FLAGS.train_dir):
-        gfile.DeleteRecursively(FLAGS.train_dir)
-    gfile.MakeDirs(FLAGS.train_dir)
-    train()
+
+    # Continue training or remove current training data
+    train_continue = None
+    while train_continue == None:
+        input_continue = raw_input("Continue training? (y/n): ")
+        input_continue.lower()
+
+        if input_continue == 'y' or input_continue == 'yes':
+            train_continue = True
+        if input_continue == 'n' or input_continue == 'no':
+            train_continue = False
+        else:
+            print("Wrong input, please type y or n.")
+
+    # Continue True
+    if train_continue:
+        train(True)
+
+    # Continue False
+    else:
+        if gfile.Exists(FLAGS.train_dir):
+            gfile.DeleteRecursively(FLAGS.train_dir)
+        gfile.MakeDirs(FLAGS.train_dir)
+        train(False)
 
 
 if __name__ == '__main__':
