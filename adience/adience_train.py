@@ -96,7 +96,7 @@ def train(train_continue):
                 # Assuming model_checkpoint_path looks something like:
                 #     /my-favorite-path/cifar10_train/model.ckpt-0,
                 # extract global_step from it.
-                load_step = int(ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1])
+                load_step = int(ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]) + 1
                 print("Start from step: {}".format(load_step))
 
             else:
@@ -108,10 +108,8 @@ def train(train_continue):
         summary_writer = tf.train.SummaryWriter(FLAGS.train_dir, graph_def=sess.graph_def)
 
         for step in xrange(FLAGS.max_steps - load_step):
-            if load_step != 0:
-                step += load_step
-                #load_step = 0
-            #print("step: {}".format(step))
+            # continue
+            step += load_step
 
             start_time = time.time()
             _, loss_value = sess.run([train_op, loss])
