@@ -29,7 +29,7 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('train_dir', '../../MLtrained',
                          """Directory where to write event logs """
                          """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 11000,
+tf.app.flags.DEFINE_integer('max_steps', 100000,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
@@ -135,6 +135,9 @@ def train(train_continue):
             if step % 1000 == 0 or (step + 1) == FLAGS.max_steps:
                 checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
+
+        else:
+            print("Step already over limit: {}".format(FLAGS.max_steps))
 
 
 def main(argv=None):    # pylint: disable=unused-argument
