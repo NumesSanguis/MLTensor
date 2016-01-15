@@ -1,0 +1,58 @@
+Conv2d input: tf.nn.conv2d(input, kernel, stride, padding, (use cudnn, name))
+    input: images
+    kernel: [dim x, dim y, input channels, output channels]
+    stride: [1, stride x, stride y, 1] 
+    padding: padding algoritme,'SAME' of 'VALID' 
+        'VALID' = zoals het in slides staat, x padding langs de rand zodat de rand waarden ook goed geconvolutioneerd (?) worden. 
+        'SAME' = iets vreemds, zie http://stackoverflow.com/questions/34619177/what-does-tf-nn-conv2d-do-in-tensorflow (sws goeie uitleg van conv2d)
+
+Max_pool input: tf.nn.max_pool(value, ksize, strides, padding, (name))
+    value: 4D input tensor (batch, height, width, channels)
+    ksize: window size voor iedere dimensie # pak max van x*y*z*a waarden
+    strides: strides voor ieder dimensie 
+    padding: zelfde als conv2d
+
+tf.nn.lrn = local response normalization - Uitleg op https://www.tensorflow.org/versions/master/api_docs/python/nn.html#local_response_normalization, precieze formule staat er. Basically herschaal alles tussen 0 en 1, */+ input variabelen.
+
+
+
+Cifar10 tuto algoritme:
+
+1) conv1:
+    - conv = conv2d(images, [5,5,3,64], [1,1,1,1], 'SAME') #5x5 convolutie met stride 1, dunno waarom 64 output chanels
+    - bias = bias_add(conv, biases)
+    - conv1 = relu(bias) #max(bias,0)
+    # check kernel, wordt geinitialiseerd via _variable_with_weight_decay, maar wd = 0.0 dus zou niet in de if wd loop moeten komen?
+
+2) pool1: tf.nn.max_pool(conv1, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1],
+                                                 padding='SAME', name='pool1')
+    # pak max van 3x3 waarden uit conv 1
+
+3) norm1: tf.nn.lrn(pool1, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75, name = 'norm2')
+    # zie niet hoe ze aan die getallen komen, weet ook niet of het relevant is
+
+4) conv2: zelfde als conv1, maar met kernel [5,5,64,64]. (en aangeroepen op norm1, niet images)
+
+5) norm2: exact als norm1 (met conv2 ipv pool1)
+    # merk op dat het de eerste keer conv > pool > lrn is, 2e keer conv > lrn > pool
+
+6) pool2: exact als pool1 (met norm2 ipv conv1)
+
+7) local3: #basically relu over pool2
+    - reshape pool2 into matrix
+    - haal variabelen weights op van cpu met size [384,192] #size??
+    - haal variabele biases op va cpu met size 384
+    - relu_layer(reshaped, weights, biases) #relu(reshape * weights + biases)
+
+8) local4: als local3, maar:
+    - weights is nu size [192, NUM_CLASSES}
+    - biases is nu NUM_CLASSES lang
+
+9) softmax_linear:
+    - haal weer weights en biases op, zelfde dimensies als local4
+    - tf.nn.xw_plus_b(local4, weights, biases)
+    # bias_add(matmul(x,weights), biases)
+
+
+    
+
