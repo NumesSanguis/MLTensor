@@ -1,0 +1,2 @@
+Original question: http://stackoverflow.com/questions/33648322/tensorflow-image-reading-display
+Own question: http://stackoverflow.com/questions/34356828/tensorflow-image-reading-empty
