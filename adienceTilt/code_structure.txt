@@ -1,4 +1,0 @@
-1) parse: data/fold_frontal_n_data.txt ->
-    user_id, original_image, gender
-    
-2) 
