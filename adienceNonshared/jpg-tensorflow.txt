@@ -1,0 +1,1 @@
+http://stackoverflow.com/questions/33648322/tensorflow-image-reading-display
